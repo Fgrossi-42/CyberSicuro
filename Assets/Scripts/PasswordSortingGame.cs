@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections;
 
 
+
 [System.Serializable]
 public class PasswordEntry
 {
@@ -109,11 +110,13 @@ public class PasswordSortingGame : MonoBehaviour
         draggedRectTransform = holder.GetComponent<RectTransform>();
         originalPosition = draggedRectTransform.anchoredPosition;
 
-        // Calculate offset between pointer and rect center
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             (RectTransform)draggedRectTransform.parent,
-            Input.mousePosition, null, out var localPointerPosition);
-        pointerOffset = draggedRectTransform.anchoredPosition - localPointerPosition;
+            Input.mousePosition,
+            null,
+            out Vector2 localPointerPos);
+
+        pointerOffset = draggedRectTransform.anchoredPosition - localPointerPos;
     }
 
     void OnDrag(GameObject holder, PointerEventData eventData)
@@ -122,8 +125,11 @@ public class PasswordSortingGame : MonoBehaviour
         {
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 (RectTransform)draggedRectTransform.parent,
-                eventData.position, eventData.pressEventCamera, out var localPointerPosition);
-            draggedRectTransform.anchoredPosition = localPointerPosition + pointerOffset;
+                eventData.position,
+                eventData.pressEventCamera,
+                out Vector2 localPointerPos);
+
+            draggedRectTransform.anchoredPosition = localPointerPos + pointerOffset;
         }
     }
 
@@ -198,7 +204,7 @@ public class PasswordSortingGame : MonoBehaviour
         if (isCorrect)
         {
             correctPanel.SetActive(true);
-            StartCoroutine(HideWrongFeedbackAfterSeconds(2.5f));
+            StartCoroutine(HideWrongFeedbackAfterSeconds(3f));
         }
         else
         {
@@ -207,10 +213,11 @@ public class PasswordSortingGame : MonoBehaviour
             resultText.text = "Wrong!";
             resultText.color = Color.red;
             wrongImage.SetActive(true);
-            // Start automatic hide coroutine (e.g. after 2.5 seconds)
-            StartCoroutine(HideWrongFeedbackAfterSeconds(2.5f));
+            // Start automatic hide coroutine (e.g. after 3 seconds)
+            StartCoroutine(HideWrongFeedbackAfterSeconds(3f));
         }
     }
+
 
     IEnumerator HideWrongFeedbackAfterSeconds(float seconds)
     {
